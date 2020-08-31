@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+import { MongoDBConnector } from './db/mongoDbConnector';
 import express, { Application, Router } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -19,7 +21,7 @@ export class App {
     this.config = config();
 
     this.configExpress();
-    this.initModules();
+    MongoDBConnector.connect(this.config).then(() => this.initModules());
   }
 
   private configExpress(): void {
@@ -32,23 +34,28 @@ export class App {
   }
 
   private initModules(): void {
-    // const apiRouter = new APIModule(this.expressApplication);
     ModuleConfig.initModules(this.router);
+  }
+
+  private showServerConnection(): void {
+    console.log(
+      chalk.bgGreen.black(`Running app on port ${this.config.port}`),
+      chalk.green.bold(`http://localhost:${this.config.port}/`)
+    );
+  }
+
+  private showHealthCheckURL(): void {
+    console.log(
+      chalk.green(
+        `Check your app health on http://localhost:${this.config.port}/health-check`
+      )
+    );
   }
 
   public run(): void {
     this.expressApplication.listen(this.config.port, () => {
-      // eslint-disable-next-line no-console
-      console.log(
-        chalk.bgGreen.black(`Running app on port ${this.config.port}`),
-        chalk.green.bold(`http://localhost:${this.config.port}/`)
-      );
-      // eslint-disable-next-line no-console
-      console.log(
-        chalk.green(
-          `Check your app health on http://localhost:${this.config.port}/health-check`
-        )
-      );
+      this.showServerConnection();
+      this.showHealthCheckURL();
     });
   }
 }
