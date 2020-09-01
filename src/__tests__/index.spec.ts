@@ -1,3 +1,5 @@
-test('Basic base test to test jest config', () => {
-  expect(true).toBe(true);
+describe('Example Test Suite', () => {
+  test('Basic base test.', () => {
+    expect(true).toBe(true);
+  });
 });
