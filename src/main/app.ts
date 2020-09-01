@@ -3,6 +3,7 @@ import { MongoDBConnector } from './db/mongoDbConnector';
 import express, { Application, Router } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import morgan from 'morgan';
 import chalk from 'chalk';
 import config from '../resources/config';
 
@@ -14,11 +15,13 @@ export class App {
   private router: Router;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private config: any;
+  private morganFormat: string;
 
   constructor() {
     this.expressApplication = express();
     this.router = express.Router();
     this.config = config();
+    this.morganFormat = this.config.env === 'development' ? 'dev' : 'combined';
 
     this.configExpress();
     MongoDBConnector.connect(this.config).then(() => this.initModules());
@@ -29,6 +32,7 @@ export class App {
     this.expressApplication.use(helmet());
     this.expressApplication.use(express.json());
     this.expressApplication.use(express.urlencoded({ extended: true }));
+    this.expressApplication.use(morgan(this.morganFormat));
     this.expressApplication.get('/health-check', HealthCheck);
     this.expressApplication.use(this.router);
   }
