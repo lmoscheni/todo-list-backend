@@ -9,6 +9,14 @@ export class TodoController {
     this.facade = todoFacade;
   }
 
+  /**
+   * @swagger
+   * /api/todo:
+   *  post:
+   *    description: Create TODO
+   *    produces:
+   *      - application/json
+   */
   public create(req: Request, res: Response, next: NextFunction): void {
     this.facade
       .create(req.body as CreateTodoBody)

@@ -1,19 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
-import { MongoDBConnector } from './db/mongoDbConnector';
 import express, { Application, Router } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import chalk from 'chalk';
+import { serve, setup } from 'swagger-ui-express';
+
 import config from '../resources/config';
+import { swaggerSpec } from '../resources/swaggerSpec';
 
 import { HealthCheck } from './middlewares/healthCheck';
 import { ModuleConfig } from './modules/moduleConfig';
 
+import { MongoDBConnector } from './db/mongoDbConnector';
+
 export class App {
   private expressApplication: Application;
   private router: Router;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private config: any;
   private morganFormat: string;
 
@@ -34,6 +38,7 @@ export class App {
     this.expressApplication.use(express.urlencoded({ extended: true }));
     this.expressApplication.use(morgan(this.morganFormat));
     this.expressApplication.get('/health-check', HealthCheck);
+    this.expressApplication.use('/api-docs', serve, setup(swaggerSpec));
     this.expressApplication.use(this.router);
   }
 
