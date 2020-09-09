@@ -1,4 +1,4 @@
 export interface InsertTodoResult {
   status: 'OK' | 'FAIL';
-  todoId?: string;
+  todoId: string;
 }

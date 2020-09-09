@@ -15,6 +15,17 @@ export class TodoRepository {
     );
   }
 
+  public validateId(id: string): Promise<boolean> {
+    return ObjectId.isValid(id) ? Promise.resolve(true) : Promise.reject(false);
+  }
+
+  public exists(id: string): Promise<boolean> {
+    return this.collection
+      .find({ _id: new ObjectId(id) })
+      .count()
+      .then((count) => count > 0);
+  }
+
   public getTodoById(todoId: string): Promise<TodoSchema | null> {
     return this.collection.findOne({ _id: new ObjectId(todoId) });
   }
