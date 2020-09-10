@@ -59,7 +59,6 @@ export class TodoController {
    *                $ref: '#/components/schemas/Todo'
    */
   public getAll(req: Request, res: Response, next: NextFunction): void {
-    console.log('LLEGO!!!');
     this.facade
       .getAll()
       .then((_) => res.send(_))
