@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import { serve, setup } from 'swagger-ui-express';
 
 import config from '../resources/config';
-import { swaggerSpec } from '../resources/swaggerSpec';
+import { buildSwaggerSpec } from '../resources/swaggerSpec';
 
 import { HealthCheck } from './middlewares/healthCheck';
 import { ModuleConfig } from './modules/moduleConfig';
@@ -19,12 +19,14 @@ export class App {
   private expressApplication: Application;
   private router: Router;
   private config: any;
+  private swaggerSpec: any;
   private morganFormat: string;
 
   constructor() {
     this.expressApplication = express();
     this.router = express.Router();
     this.config = config();
+    this.swaggerSpec = buildSwaggerSpec(this.config);
     this.morganFormat = this.config.env === 'development' ? 'dev' : 'combined';
 
     this.configExpress();
@@ -37,8 +39,8 @@ export class App {
     this.expressApplication.use(express.json());
     this.expressApplication.use(express.urlencoded({ extended: true }));
     this.expressApplication.use(morgan(this.morganFormat));
-    this.expressApplication.get('/health-check', HealthCheck);
-    this.expressApplication.use('/api-docs', serve, setup(swaggerSpec));
+    this.expressApplication.get('/health-check', HealthCheck(this.config));
+    this.expressApplication.use('/api-docs', serve, setup(this.swaggerSpec));
     this.expressApplication.use(this.router);
   }
 
@@ -61,10 +63,19 @@ export class App {
     );
   }
 
+  private showHealthSwaggerURL(): void {
+    console.log(
+      chalk.green(
+        `Check your app health on http://localhost:${this.config.port}/api-docs`
+      )
+    );
+  }
+
   public run(): void {
     this.expressApplication.listen(this.config.port, () => {
       this.showServerConnection();
       this.showHealthCheckURL();
+      this.showHealthSwaggerURL();
     });
   }
 }

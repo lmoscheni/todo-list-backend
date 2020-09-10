@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   SystemAPIException,
   TodoBadRequestException,
@@ -79,7 +80,6 @@ export class TodoFacade {
 
   private async validateTodoId(
     todoId: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any
   ): Promise<void | APIException> {
     const { isValid, exists } = await this.service.validateId(todoId);
